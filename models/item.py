@@ -6,37 +6,25 @@ class ItemModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     price = db.Column(db.Float(precision=2))
-    
+
     def __init__(self,name,price):
         self.name = name
         self.price = price
 
     def json(self):
         return { 'name': self.name,  'price': self.price }
-
-
+        
     @classmethod
     def find_by_name(cls,name):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query = "select * from items where name = ?"
-        result = cursor.execute(query, (name,))
-        row = result.fetchone()
-        connection.close();
-        if row:
-            return cls(*row) # same as cls(row[0], row[1])
+        return ItemModel.query.filter_by(name=name).first()
+        # equivalent to select * from items where name = name LIMIT 1
+        # followed by conversion to an
+
+    def save_to_db(self):
+        db.session.add(self) # is really an upsert
+        db.session.commit()
 
 
-    def insert(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        cursor.execute("insert into items values(?,?)", (self.name, self.price))
-        connection.commit()
-        connection.close()
-
-    def update(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        cursor.execute("update items set price = ? where name=? ", (self.price, self.name))
-        connection.commit()
-        connection.close()
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
