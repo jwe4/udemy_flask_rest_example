@@ -13,18 +13,23 @@ class ItemModel(db.Model):
 
     def json(self):
         return { 'name': self.name,  'price': self.price }
-        
+
     @classmethod
     def find_by_name(cls,name):
         return ItemModel.query.filter_by(name=name).first()
         # equivalent to select * from items where name = name LIMIT 1
         # followed by conversion to an
 
+    @classmethod
+    def find_all(cls):
+        return [ item.json() for item in cls.query.all()]
+        # or list(map(lambda x: x.json(), ItemModel.query.all()))
+
     def save_to_db(self):
         db.session.add(self) # is really an upsert
         db.session.commit()
 
 
-    def delete(self):
+    def delete_from_db(self):
         db.session.delete(self)
         db.session.commit()

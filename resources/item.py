@@ -18,6 +18,7 @@ class Item(Resource):
 
     @jwt_required()
     def get(self, name):  # allows get
+        print("name is  {}".format(name))
         item = ItemModel.find_by_name(name)
         if item:
             return item.json()
@@ -63,11 +64,4 @@ class ItemList(Resource):
 
     @jwt_required()
     def get(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        result = cursor.execute("select * from items")
-        items = []
-        for row in result:
-            items.append( { 'name' :  row[0], 'price': row[1]})
-        connection.close()
-        return { 'items': items }
+        return { 'items' : ItemModel.find_all() }

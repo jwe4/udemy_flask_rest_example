@@ -9,35 +9,19 @@ class UserModel(db.Model):
     password = db.Column(db.String(80))
     # user _id because id is a python keyword
 
-    def __init__(self, _id, username, password):
-        self.id = _id
+    def __init__(self, username, password):
         self.username = username
         self.password = password
 
+    def save_to_db(_self):
+        db.session.add(self) # is really an upsert
+        db.session.commit()
+
     @classmethod
     def find_by_username(cls, username):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query = "select * from users where username=?"
-        result = cursor.execute(query, (username,))
-        row = result.fetchone()
-        if row:
-            user = cls(*row)
-        else:
-            user = None
-        connection.close()
-        return user
+        return cls.query.filter_by(username = username).first()
+
 
     @classmethod
     def find_by_id(cls, _id):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query = "select * from users where id=?"
-        result = cursor.execute(query, (_id,))
-        row = result.fetchone()
-        if row:
-            user = cls(*row)
-        else:
-            user = None
-        connection.close()
-        return user
+        return cls.query.filter_by(id = _id).first()
