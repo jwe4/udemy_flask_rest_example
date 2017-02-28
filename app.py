@@ -20,6 +20,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.secret_key = 'mysecretkey999'  # in real app want to hide this
 api = Api(app)
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 jwt = JWT(app, authenticate, identity)
 
 # jwt creates a new endpoint /auth

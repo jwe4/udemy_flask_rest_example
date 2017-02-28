@@ -13,7 +13,7 @@ class UserModel(db.Model):
         self.username = username
         self.password = password
 
-    def save_to_db(_self):
+    def save_to_db(self):
         db.session.add(self) # is really an upsert
         db.session.commit()
 
